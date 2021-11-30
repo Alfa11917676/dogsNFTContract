@@ -24,16 +24,27 @@ async function main() {
   await dogsContract.connect(owner).freeSaleBuy();
   try {
     await dogsContract.connect(owner).freeSaleBuy();
-  }catch(e){
+  } catch(e) {
     console.log("Error from owner because of "+e)
   }
+
 
   await dogsContract.connect(anotherOwner).freeSaleBuy();
   console.log(await dogsContract.balanceOf(owner.address));
   console.log(await dogsContract.balanceOf(arnab.address));
   console.log(await dogsContract.balanceOf(anotherOwner.address));
-  console.log(dogsContract.address);
+  // console.log(dogsContract.address);
+  // console.log (arnab.address);
+  // console.log (owner.address);
+  // console.log (anotherOwner.address);
 
+  console.log(await dogsContract.ownerAddress());
+  await  dogsContract.connect(owner).changeOwnerAddress (anotherOwner.address);
+  await dogsContract.connect(owner).transferOwnership (anotherOwner.address);
+  console.log(await dogsContract.ownerAddress());
+  // await dogsContract.transferOwnership(owner.address);
+  // await dogsContract.changeOwnerAddress (owner.address);
+  // console.log(await dogsContract.ownerAddress());
 }
 
 // We recommend this pattern to be able to use async/await everywhere

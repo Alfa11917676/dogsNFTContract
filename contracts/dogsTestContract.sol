@@ -1630,7 +1630,7 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
     string private _tokenBaseURI = "https://gateway.pinata.cloud/ipfs/QmNNmN2JGayxRk3hwEWw5gMCUyfmikgosrAQuCWnc9tDdN/";
     string private constant Sig_WORD = "private";
     address private _signerAddress = 0x956231B802D9494296acdE7B3Ce3890c8b0438b8;
-    address private ownerAddress;
+    address public ownerAddress;
     uint256 public privateAmountMinted;
     uint256 public presalePurchaseLimit = 5;
     uint256 public freesalePurchaseLimit = 5;
@@ -1641,6 +1641,14 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
     modifier notLocked {
         require(!locked, "Contract metadata methods are locked");
         _;
+    }
+
+    constructor() ERC721("DOGS", "DOGS") {
+        ownerAddress = msg.sender;
+    }
+
+    function changeOwnerAddress (address _newOwner) external onlyOwner {
+        ownerAddress = _newOwner;
     }
 
     function setFreeMintLimitToAddress(address[] memory _address, uint[] memory _amount) external onlyOwner {
@@ -1756,10 +1764,5 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
 
         return string(abi.encodePacked(_tokenBaseURI, tokenId.toString()));
     }
-    
-    
-    
-    constructor() ERC721("DOGS", "DOGS") {
-        ownerAddress = msg.sender;
-    }
+
 }
