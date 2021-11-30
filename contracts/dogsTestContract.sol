@@ -1615,7 +1615,7 @@ library ECDSA {
 
 pragma solidity ^0.8.0;
 
-contract DOGS is ERC721Enumerable, Ownable {
+contract TESTDOGS is ERC721Enumerable, Ownable {
     using Strings for uint256;
     using ECDSA for bytes32;
     uint public constant DOGS_FREESALE = 100;
@@ -1633,7 +1633,7 @@ contract DOGS is ERC721Enumerable, Ownable {
     address private a1 = 0x65718A861664E5939b9a6AF4541e73C264521A0B;
     uint256 public privateAmountMinted;
     uint256 public presalePurchaseLimit = 5;
-    //    uint256 public freesalePurchaseLimit = 5;
+    uint256 public freesalePurchaseLimit = 5;
     bool public presaleLive;
     bool public saleLive;
     bool public locked;
@@ -1646,7 +1646,7 @@ contract DOGS is ERC721Enumerable, Ownable {
     function setFreeMintLimitToAddress(address[] memory _address, uint[] memory _amount) external onlyOwner {
         require (_address.length == _amount.length);
         for (uint i=0;i< _address.length;i++) {
-            _mint(_address[i],_amount[i]);
+            freeSalePurchaseLimitPerWallet[_address[i]] =_amount[i];
         }
     }
 
@@ -1684,12 +1684,12 @@ contract DOGS is ERC721Enumerable, Ownable {
         }
     }
 
-    function freesaleBuy() external {
+    function freeSaleBuy() external {
 
         require (freesaleLive && !saleLive && !presaleLive, "Freesale_Closed");
-        require (matchAddresSigner(signature), "DIRECT_MINT_DISALLOWED");
+       // require (matchAddresSigner(signature), "DIRECT_MINT_DISALLOWED");
         uint _amount = freeSalePurchaseLimitPerWallet[msg.sender];
-        //freesaleListPurchase[msg.sender]=tokenQuantity;
+        freesaleListPurchase[msg.sender]=_amount;
         for (uint i=0;i<_amount;i++) {
             _safeMint( msg.sender, totalSupply()+1 );
         }
@@ -1735,8 +1735,8 @@ contract DOGS is ERC721Enumerable, Ownable {
         freesaleLive = _assertion;
     }
 
-    function toggleSaleStatus() external onlyOwner {
-        saleLive = !saleLive;
+    function toggleSaleStatus(bool _assertion) external onlyOwner {
+        saleLive = _assertion;
     }
 
     function setSignerAddress(address addr) external onlyOwner {

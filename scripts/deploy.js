@@ -6,6 +6,7 @@
 const hre = require("hardhat");
 
 async function main() {
+  [owner,anotherOwner]= await ethers.getSigners();
   // Hardhat always runs the compile task when running scripts with its command
   // line interface.
   //
@@ -14,12 +15,16 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const Greeter = await hre.ethers.getContractFactory("Greeter");
-  const greeter = await Greeter.deploy("Hello, Hardhat!");
+  const GetDogsContract = await hre.ethers.getContractFactory("TESTDOGS");
+  const dogsContract = await GetDogsContract.deploy();
+  var _values = 5;
+  await dogsContract.setFreeMintLimitToAddress([owner.address,anotherOwner.address],[_values,_values]);
+  await dogsContract.toggleFreeSaleStatus(true);
+  console.log("reached");
+  await dogsContract.connect(owner).freeSaleBuy();
+  console.log(await dogsContract.freeSalePurchaseCount(owner.address));
+  console.log(dogsContract.address);
 
-  await greeter.deployed();
-
-  console.log("Greeter deployed to:", greeter.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
