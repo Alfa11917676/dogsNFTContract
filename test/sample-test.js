@@ -17,10 +17,10 @@ describe("Dogs contract", function () {
     await dogsContract.setFreeMintLimitToAddress([owner.address,anotherOwner.address],[_values,_values]);
     await dogsContract.connect(owner).freeSaleBuy();
     await dogsContract.connect(anotherOwner).freeSaleBuy();
+    await
 
     expect(await dogsContract.balanceOf(owner.address)).to.equal("0x05");
     expect(await dogsContract.balanceOf(anotherOwner.address)).to.equal("0x05");
-    expect(await dogsContract.balanceOf(arnab.address)).to.equal("0x00");
     expect(await dogsContract.balanceOf(arnab.address)).to.equal("0x00");
   });
 });

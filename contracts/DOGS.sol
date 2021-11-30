@@ -1615,25 +1615,27 @@ library ECDSA {
 
 pragma solidity ^0.8.0;
 
-contract DOGS is ERC721Enumerable, Ownable {
+contract TESTDOGS is ERC721Enumerable, Ownable {
     using Strings for uint256;
     using ECDSA for bytes32;
-    uint public constant DOGS_FREESALE = 100;
-    uint256 public constant DOGS_PRIVATE = 500;
-    uint256 public constant DOGS_WALLET_LIMIT = 20;
-    uint256 public constant DOGS_MAX =  10000;
-    uint256 public constant DOGS_PRICE = 0.05 ether;
-    uint256 public constant DOGS_PER_PUBLIC_MINT = 20;
-    mapping(address => uint256) public presalerListPurchases;
-    mapping (address => uint)   public freesaleListPurchase;
+    uint256 public constant DOGS_PRIVATE = 500; //presale
+    uint256 public constant DOGS_WALLET_LIMIT = 20; //dogsperwalletInWholeDuration
+    uint256 public constant DOGS_MAX_COUNT =  10000; //maxSupply
+    uint256 public constant DOGS_MAINSALE_PRICE = 0.05 ether; //priceInMainSale
+    uint256 public constant DOGS_PRESALE_PRICE = 0.04 ether; //priceInPreSale
+
+    mapping (address => uint) public globalTokenTracker;
+    mapping (address => uint) public presalerListPurchases;
+    mapping (address => uint) public freesaleListPurchases;
     mapping (address => uint) public freeSalePurchaseLimitPerWallet;
+
+    //todo : we need to change this baseURI
     string private _tokenBaseURI = "https://gateway.pinata.cloud/ipfs/QmNNmN2JGayxRk3hwEWw5gMCUyfmikgosrAQuCWnc9tDdN/";
     string private constant Sig_WORD = "private";
     address private _signerAddress = 0x956231B802D9494296acdE7B3Ce3890c8b0438b8;
-    address private a1 = 0x65718A861664E5939b9a6AF4541e73C264521A0B;
+    address public ownerAddress;
     uint256 public privateAmountMinted;
-    uint256 public presalePurchaseLimit = 5;
-    //    uint256 public freesalePurchaseLimit = 5;
+    uint256 public presalePurchaseLimit = 10;
     bool public presaleLive;
     bool public saleLive;
     bool public locked;
@@ -1641,6 +1643,14 @@ contract DOGS is ERC721Enumerable, Ownable {
     modifier notLocked {
         require(!locked, "Contract metadata methods are locked");
         _;
+    }
+
+    constructor() ERC721("DOGS", "DOGS") {
+        ownerAddress = msg.sender;
+    }
+
+    function changeOwnerAddress (address _newOwner) external onlyOwner {
+        ownerAddress = _newOwner;
     }
 
     function setFreeMintLimitToAddress(address[] memory _address, uint[] memory _amount) external onlyOwner {
@@ -1659,14 +1669,15 @@ contract DOGS is ERC721Enumerable, Ownable {
     }
 
     function founderMint(uint256 tokenQuantity) external onlyOwner {
-        require(totalSupply() + tokenQuantity <= DOGS_MAX, "EXCEED_MAX");
+        require(totalSupply() + tokenQuantity <= DOGS_MAX_COUNT, "EXCEED_MAX");
         for(uint256 i = 0; i < tokenQuantity; i++) {
             _safeMint(msg.sender, totalSupply() + 1);
         }
     }
 
+    //todo : need to confirm from metamorpheus and dylan
     function gift(address[] calldata receivers) external onlyOwner {
-        require(totalSupply() + receivers.length <= DOGS_MAX, "EXCEED_MAX");
+        require(totalSupply() + receivers.length <= DOGS_MAX_COUNT, "EXCEED_MAX");
         for (uint256 i = 0; i < receivers.length; i++) {
             _safeMint(receivers[i], totalSupply() + 1);
         }
@@ -1675,39 +1686,36 @@ contract DOGS is ERC721Enumerable, Ownable {
     function buy(uint256 tokenQuantity) external payable {
         require(saleLive, "SALE_CLOSED");
         require(!presaleLive, "ONLY_PRESALE");
-        require(totalSupply() + tokenQuantity <= DOGS_MAX, "EXCEED_MAX");
-        require(tokenQuantity <= DOGS_PER_PUBLIC_MINT, "EXCEED_DOGS_PER_PUBLIC_MINT");
+        require(totalSupply() + tokenQuantity <= DOGS_MAX_COUNT, "EXCEED_MAX");
         require(balanceOf(msg.sender)+tokenQuantity <= DOGS_WALLET_LIMIT, "EXCEED_WALLET_LIMIT");
-        require(DOGS_PRICE * tokenQuantity <= msg.value, "INSUFFICIENT_ETH");
+        require(DOGS_MAINSALE_PRICE * tokenQuantity <= msg.value, "INSUFFICIENT_ETH");
         for(uint256 i = 0; i < tokenQuantity; i++) {
             _safeMint(msg.sender, totalSupply() + 1);
         }
     }
 
-    function freesaleBuy(bytes memory signature) external {
-
+    function freeSaleBuy(bytes memory signature) external {
         require (freesaleLive && !saleLive && !presaleLive, "Freesale_Closed");
-        require (matchAddresSigner(signature), "DIRECT_MINT_DISALLOWED");
-        uint _amount = freeSalePurchaseLimitPerWallet[msg.sender];
+        uint _freeTokenLeft = freeSalePurchaseLimitPerWallet[msg.sender];
         freeSalePurchaseLimitPerWallet[msg.sender] = 0;
-
-        require (_amount > 0, "No tokens left to mint");
-        freesaleListPurchase[msg.sender]=_amount;
-        for (uint i=0;i<_amount;i++) {
+        require (_freeTokenLeft > 0, "Limit Exceeded");
+        freesaleListPurchases[msg.sender]=_freeTokenLeft;
+        for (uint i=0;i<_freeTokenLeft;i++) {
             _safeMint( msg.sender, totalSupply()+1 );
         }
     }
 
     function freeSalePurchaseCount(address _address) external view returns (uint) {
-        return freesaleListPurchase[_address];
+        return freeSalePurchaseLimitPerWallet[_address];
     }
 
+    //todo rename DOGS_PRIVATE TO DOGS_PRESALE_LIMIT
     function presaleBuy(bytes memory signature, uint256 tokenQuantity) external payable {
         require(!saleLive && presaleLive, "PRESALE_CLOSED");
         require(matchAddresSigner(signature), "DIRECT_MINT_DISALLOWED");
         require(privateAmountMinted + tokenQuantity <= DOGS_PRIVATE, "EXCEED_PRIVATE");
         require(presalerListPurchases[msg.sender] + tokenQuantity <= presalePurchaseLimit, "EXCEED_ALLOC");
-        require(DOGS_PRICE * tokenQuantity <= msg.value, "INSUFFICIENT_ETH");
+        require(DOGS_MAINSALE_PRICE * tokenQuantity <= msg.value, "INSUFFICIENT_ETH");
 
         for(uint256 i = 0; i < tokenQuantity; i++) {
             privateAmountMinted++;
@@ -1716,10 +1724,11 @@ contract DOGS is ERC721Enumerable, Ownable {
         }
     }
 
-    function withdraw() external {
+    function withdraw() external onlyOwner {
         uint256 balance = address(this).balance;
         require(balance > 0);
-        payable(a1).transfer(address(this).balance);
+        //todo: use owner address from the contract to send the money
+        payable(ownerAddress).transfer(address(this).balance);
     }
 
     function presalePurchasedCount(address addr) external view returns (uint256) {
@@ -1738,8 +1747,8 @@ contract DOGS is ERC721Enumerable, Ownable {
         freesaleLive = _assertion;
     }
 
-    function setSaleStatus() external onlyOwner {
-        saleLive = !saleLive;
+    function setSaleStatus(bool _assertion) external onlyOwner {
+        saleLive = _assertion;
     }
 
     function setSignerAddress(address addr) external onlyOwner {
@@ -1756,5 +1765,4 @@ contract DOGS is ERC721Enumerable, Ownable {
         return string(abi.encodePacked(_tokenBaseURI, tokenId.toString()));
     }
 
-    constructor() ERC721("DOGS", "DOGS") {}
 }
