@@ -1630,7 +1630,7 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
     string private _tokenBaseURI = "https://gateway.pinata.cloud/ipfs/QmNNmN2JGayxRk3hwEWw5gMCUyfmikgosrAQuCWnc9tDdN/";
     string private constant Sig_WORD = "private";
     address private _signerAddress = 0x956231B802D9494296acdE7B3Ce3890c8b0438b8;
-    address private a1 = 0x65718A861664E5939b9a6AF4541e73C264521A0B;
+    address private ownerAddress;
     uint256 public privateAmountMinted;
     uint256 public presalePurchaseLimit = 5;
     uint256 public freesalePurchaseLimit = 5;
@@ -1665,6 +1665,8 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
         }
     }
 
+    //todo : relook
+
     function gift(address[] calldata receivers) external onlyOwner {
         require(totalSupply() + receivers.length <= DOGS_MAX, "EXCEED_MAX");
         for (uint256 i = 0; i < receivers.length; i++) {
@@ -1687,16 +1689,18 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
     function freeSaleBuy() external {
 
         require (freesaleLive && !saleLive && !presaleLive, "Freesale_Closed");
-       // require (matchAddresSigner(signature), "DIRECT_MINT_DISALLOWED");
-        uint _amount = freeSalePurchaseLimitPerWallet[msg.sender];
-        freesaleListPurchase[msg.sender]=_amount;
-        for (uint i=0;i<_amount;i++) {
+
+        uint _freeTokenLeft = freeSalePurchaseLimitPerWallet[msg.sender];
+        freeSalePurchaseLimitPerWallet[msg.sender] = 0;
+        require (_freeTokenLeft > 0, "Limit Exceeded");
+        freesaleListPurchase[msg.sender]=_freeTokenLeft;
+        for (uint i=0;i<_freeTokenLeft;i++) {
             _safeMint( msg.sender, totalSupply()+1 );
         }
     }
 
     function freeSalePurchaseCount(address _address) external view returns (uint) {
-        return freesaleListPurchase[_address];
+        return freeSalePurchaseLimitPerWallet[_address];
     }
 
     function presaleBuy(bytes memory signature, uint256 tokenQuantity) external payable {
@@ -1712,11 +1716,11 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
             _safeMint(msg.sender, totalSupply() + 1);
         }
     }
-
     function withdraw() external {
         uint256 balance = address(this).balance;
         require(balance > 0);
-        payable(a1).transfer(address(this).balance);
+        //todo: use owner address from the contract to send the money
+        payable(ownerAddress).transfer(address(this).balance);
     }
 
     function presalePurchasedCount(address addr) external view returns (uint256) {
@@ -1727,15 +1731,15 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
         locked = _assertion;
     }
 
-    function togglePresaleStatus(bool _assertion) external onlyOwner {
+    function setPresaleStatus(bool _assertion) external onlyOwner {
         presaleLive = _assertion;
     }
 
-    function toggleFreeSaleStatus(bool _assertion) external onlyOwner {
+    function setFreeSaleStatus(bool _assertion) external onlyOwner {
         freesaleLive = _assertion;
     }
 
-    function toggleSaleStatus(bool _assertion) external onlyOwner {
+    function setSaleStatus(bool _assertion) external onlyOwner {
         saleLive = _assertion;
     }
 
@@ -1752,6 +1756,10 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
 
         return string(abi.encodePacked(_tokenBaseURI, tokenId.toString()));
     }
-
-    constructor() ERC721("DOGS", "DOGS") {}
+    
+    
+    
+    constructor() ERC721("DOGS", "DOGS") {
+        ownerAddress = msg.sender;
+    }
 }

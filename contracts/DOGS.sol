@@ -1689,7 +1689,10 @@ contract DOGS is ERC721Enumerable, Ownable {
         require (freesaleLive && !saleLive && !presaleLive, "Freesale_Closed");
         require (matchAddresSigner(signature), "DIRECT_MINT_DISALLOWED");
         uint _amount = freeSalePurchaseLimitPerWallet[msg.sender];
-        //freesaleListPurchase[msg.sender]=tokenQuantity;
+        freeSalePurchaseLimitPerWallet[msg.sender] = 0;
+
+        require (_amount > 0, "No tokens left to mint");
+        freesaleListPurchase[msg.sender]=_amount;
         for (uint i=0;i<_amount;i++) {
             _safeMint( msg.sender, totalSupply()+1 );
         }
@@ -1727,15 +1730,15 @@ contract DOGS is ERC721Enumerable, Ownable {
         locked = _assertion;
     }
 
-    function togglePresaleStatus(bool _assertion) external onlyOwner {
+    function setPresaleStatus(bool _assertion) external onlyOwner {
         presaleLive = _assertion;
     }
 
-    function toggleFreeSaleStatus(bool _assertion) external onlyOwner {
+    function setFreeSaleStatus(bool _assertion) external onlyOwner {
         freesaleLive = _assertion;
     }
 
-    function toggleSaleStatus() external onlyOwner {
+    function setSaleStatus() external onlyOwner {
         saleLive = !saleLive;
     }
 

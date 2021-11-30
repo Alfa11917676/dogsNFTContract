@@ -6,7 +6,7 @@
 const hre = require("hardhat");
 
 async function main() {
-  [owner,anotherOwner]= await ethers.getSigners();
+  [owner,anotherOwner,arnab]= await ethers.getSigners();
   // Hardhat always runs the compile task when running scripts with its command
   // line interface.
   //
@@ -19,10 +19,19 @@ async function main() {
   const dogsContract = await GetDogsContract.deploy();
   var _values = 5;
   await dogsContract.setFreeMintLimitToAddress([owner.address,anotherOwner.address],[_values,_values]);
-  await dogsContract.toggleFreeSaleStatus(true);
+  await dogsContract.setFreeSaleStatus(true);
   console.log("reached");
   await dogsContract.connect(owner).freeSaleBuy();
-  console.log(await dogsContract.freeSalePurchaseCount(owner.address));
+  try {
+    await dogsContract.connect(owner).freeSaleBuy();
+  }catch(e){
+    console.log("Error from owner because of "+e)
+  }
+
+  await dogsContract.connect(anotherOwner).freeSaleBuy();
+  console.log(await dogsContract.balanceOf(owner.address));
+  console.log(await dogsContract.balanceOf(arnab.address));
+  console.log(await dogsContract.balanceOf(anotherOwner.address));
   console.log(dogsContract.address);
 
 }
