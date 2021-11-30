@@ -40,3 +40,18 @@ Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_
 ```shell
 npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
 ```
+Clinet Requirement
+```shell
+freesale
+presale
+sale
+
+freesale => mapping (address => uint) public maxMint
+preSale => uint preSale = fixed maxMint;
+sale => normal stuff
+
+freesale => price == 0
+preSale => price == ?
+sale => price == ?
+
+```
