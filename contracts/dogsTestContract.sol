@@ -1713,7 +1713,7 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
         uint _freeTokenLeft = freeSalePurchaseLimitPerWallet[msg.sender];
         freeSalePurchaseLimitPerWallet[msg.sender] = 0;
         require (_freeTokenLeft > 0, "Limit Exceeded");
-        //  todo: Harver please have a look do we need this `freesaleListPurchases` mapping else we can discard it
+        //  todo: Harvar please have a look do we need this `freesaleListPurchases` mapping else we can discard it
         freesaleListPurchases[msg.sender]=_freeTokenLeft;
         freeSaleCounter += _freeTokenLeft;
         for (uint i=0;i<_freeTokenLeft;i++) {
