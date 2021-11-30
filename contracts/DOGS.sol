@@ -1646,7 +1646,7 @@ contract DOGS is ERC721Enumerable, Ownable {
     function setFreeMintLimitToAddress(address[] memory _address, uint[] memory _amount) external onlyOwner {
         require (_address.length == _amount.length);
         for (uint i=0;i< _address.length;i++) {
-            _mint(_address[i],_amount[i]);
+            freeSalePurchaseLimitPerWallet[_address[i]] =_amount[i];
         }
     }
 
