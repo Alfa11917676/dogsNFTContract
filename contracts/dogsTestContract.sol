@@ -1643,7 +1643,7 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
     string private _tokenBaseURI = "https://gateway.pinata.cloud/ipfs/QmNNmN2JGayxRk3hwEWw5gMCUyfmikgosrAQuCWnc9tDdN/";
     string private constant Sig_WORD = "private";
     address private _signerAddress = 0x956231B802D9494296acdE7B3Ce3890c8b0438b8;
-    address public ownerAddress;
+   // address public ownerAddress;
     uint public privateAmountMinted;
     bool public presaleLive;
     bool public saleLive;
@@ -1658,9 +1658,9 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
         ownerAddress = msg.sender;
     }
 
-    function changeOwnerAddress (address _newOwner) external onlyOwner {
-        ownerAddress = _newOwner;
-    }
+//    function changeOwnerAddress (address _newOwner) external onlyOwner {
+//        ownerAddress = _newOwner;
+//    }
 
     function setFreeMintLimitToAddress(address[] memory _address, uint[] memory _amount) external onlyOwner {
         require (_address.length == _amount.length);
