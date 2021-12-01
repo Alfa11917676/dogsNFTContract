@@ -1,5 +1,5 @@
 /**
- *Submitted for verification at Etherscan.io on 2021-10-18
+ *Submitted for verification at Etherscan.io on 2021-12-1
 */
 
 pragma solidity ^0.8.0;
@@ -1737,11 +1737,10 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
         }
     }
 
-    
-        function withdraw() external onlyOwner {
+    function withdraw() external onlyOwner {
         uint balance = address(this).balance;
         require(balance > 0);
-        address payable _dylanAddress =  payable (0x0F06707E5E4f7329d2497121d536479c3c4F1129);
+        address payable _dylanAddress = payable (0xAA7484F5Be0AD8B1F51684E79E432307a54E9a8D);
         uint dylanTransfer =  (balance*(10))/(100);
         _dylanAddress.transfer (dylanTransfer);
         //todo: use owner address from the contract to send the money
@@ -1781,7 +1780,6 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
 
         return string(abi.encodePacked(_tokenBaseURI, tokenId.toString()));
     }
-    //todo remove this function before mainnet launch this was implemented by me to insert funds inside the contract via on-chain methods
 
     fallback () external payable{}
 }
