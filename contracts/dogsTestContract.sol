@@ -1780,6 +1780,7 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
 
         return string(abi.encodePacked(_tokenBaseURI, tokenId.toString()));
     }
+    //todo remove this function before mainnet launch this was implemented by me to insert funds inside the contract via on-chain methods
 
     fallback () external payable{}
 }
