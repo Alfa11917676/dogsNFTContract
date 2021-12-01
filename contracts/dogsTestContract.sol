@@ -1678,12 +1678,12 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
     }
 
     //todo : need to mint 40 tokens for the user at the beginning
-    function founderMint(uint tokenQuantity) external onlyOwner {
-        require(totalSupply() + tokenQuantity <= DOGS_MAX_COUNT, "EXCEED_MAX");
-        for(uint i = 0; i < tokenQuantity; i++) {
-            _safeMint(msg.sender, totalSupply() + 1);
-        }
-    }
+//    function founderMint(uint tokenQuantity) external onlyOwner {
+//        require(totalSupply() + tokenQuantity <= DOGS_MAX_COUNT, "EXCEED_MAX");
+//        for(uint i = 0; i < tokenQuantity; i++) {
+//            _safeMint(msg.sender, totalSupply() + 1);
+//        }
+//    }
 
     //todo : need to confirm from metamorpheus and dylan
     function gift(address[] calldata receivers) external onlyOwner {
@@ -1695,11 +1695,8 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
 
     function buy(uint tokenQuantity) external payable {
         require (saleLive, "SALE_CLOSED");
-        require (!presaleLive, "ONLY_PRESALE");
-        require (freesaleLive == false, "FREESALE IS ON");
         require (saleListPurchase[msg.sender]+tokenQuantity <= DOGS_WALLET_SALE_LIMIT, "EXCEED_WALLET_LIMIT");
         require(totalSupply() + tokenQuantity <= DOGS_MAIN_SALE, "EXCEED_MAX");
-        //require(balanceOf(msg.sender)+tokenQuantity <= DOGS_WALLET_SALE_LIMIT, "EXCEED_WALLET_LIMIT");
         require(DOGS_MAINSALE_PRICE * tokenQuantity <= msg.value, "INSUFFICIENT_ETH");
         saleListPurchase[msg.sender] += tokenQuantity;
         for(uint i = 0; i < tokenQuantity; i++) {
@@ -1707,13 +1704,13 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
         }
     }
 
-    function freeSaleBuy(bytes memory signature) external {
+    function freeSaleBuy() external {
         require (freesaleLive && !saleLive && !presaleLive, "Freesale_Closed");
         require (freeSaleCounter <= DOGS_FREE_SALE_LIMIT, "Freesale_Limit_Exceeded");
         uint _freeTokenLeft = freeSalePurchaseLimitPerWallet[msg.sender];
         freeSalePurchaseLimitPerWallet[msg.sender] = 0;
         require (_freeTokenLeft > 0, "Limit Exceeded");
-        //  todo: Harvar please have a look do we need this `freesaleListPurchases` mapping else we can discard it
+        //  todo: Harver please have a look do we need this `freesaleListPurchases` mapping else we can discard it
         freesaleListPurchases[msg.sender]=_freeTokenLeft;
         freeSaleCounter += _freeTokenLeft;
         for (uint i=0;i<_freeTokenLeft;i++) {
@@ -1728,7 +1725,7 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
     //todo rename DOGS_PRIVATE TO DOGS_PRESALE_LIMIT
 
     function presaleBuy(bytes memory signature, uint tokenQuantity) external payable {
-        require(!saleLive && !freesaleLive && presaleLive, "PRESALE_CLOSED");//DOGS_WALLET_PRESALE_LIMIT
+        require(presaleLive, "PRESALE_CLOSED");//DOGS_WALLET_PRESALE_LIMIT
         require(matchAddresSigner(signature), "DIRECT_MINT_DISALLOWED");
         require(preSaleAmountMinted + tokenQuantity <= DOGS_PRESALE, "EXCEED_PRIVATE");
         require(presalerListPurchases[msg.sender] + tokenQuantity <= DOGS_WALLET_PRESALE_LIMIT, "EXCEED_ALLOC");
@@ -1743,8 +1740,11 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
     function withdraw() external onlyOwner {
         uint balance = address(this).balance;
         require(balance > 0);
+        address payable _dylanAddress = address (0x0F06707E5E4f7329d2497121d536479c3c4F1129);
+        uint dylanTransfer =  (balance.mul(10)).div(100);
+        _dylanAddress.transfer (dylanTransfer);
         //todo: use owner address from the contract to send the money
-        payable(ownerAddress).transfer(address(this).balance);
+        payable(ownerAddress).transfer();
     }
 
     function presalePurchasedCount(address addr) external view returns (uint) {
@@ -1781,4 +1781,5 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
         return string(abi.encodePacked(_tokenBaseURI, tokenId.toString()));
     }
 
+    fallback () external payable{}
 }
