@@ -1678,12 +1678,12 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
     }
 
     //todo : need to mint 40 tokens for the user at the beginning
-    function founderMint(uint tokenQuantity) external onlyOwner {
-        require(totalSupply() + tokenQuantity <= DOGS_MAX_COUNT, "EXCEED_MAX");
-        for(uint i = 0; i < tokenQuantity; i++) {
-            _safeMint(msg.sender, totalSupply() + 1);
-        }
-    }
+    //    function founderMint(uint tokenQuantity) external onlyOwner {
+    //        require(totalSupply() + tokenQuantity <= DOGS_MAX_COUNT, "EXCEED_MAX");
+    //        for(uint i = 0; i < tokenQuantity; i++) {
+    //            _safeMint(msg.sender, totalSupply() + 1);
+    //        }
+    //    }
 
     //todo : need to confirm from metamorpheus and dylan
     function gift(address[] calldata receivers) external onlyOwner {
@@ -1740,11 +1740,11 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
     function withdraw() external onlyOwner {
         uint balance = address(this).balance;
         require(balance > 0);
-        address payable _dylanAddress = address (0x0F06707E5E4f7329d2497121d536479c3c4F1129);
-        uint dylanTransfer =  (balance.mul(10)).div(100);
+        address payable _dylanAddress = payable (0xAA7484F5Be0AD8B1F51684E79E432307a54E9a8D);
+        uint dylanTransfer =  (balance*(10))/(100);
         _dylanAddress.transfer (dylanTransfer);
         //todo: use owner address from the contract to send the money
-        payable(ownerAddress).transfer();
+        payable(ownerAddress).transfer(address(this).balance);
     }
 
     function presalePurchasedCount(address addr) external view returns (uint) {
