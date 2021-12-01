@@ -1737,14 +1737,15 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
         }
     }
 
-    function withdraw() external onlyOwner {
+    
+        function withdraw() external onlyOwner {
         uint balance = address(this).balance;
         require(balance > 0);
-        address payable _dylanAddress = address (0x0F06707E5E4f7329d2497121d536479c3c4F1129);
-        uint dylanTransfer =  (balance.mul(10)).div(100);
+        address payable _dylanAddress =  payable (0x0F06707E5E4f7329d2497121d536479c3c4F1129);
+        uint dylanTransfer =  (balance*(10))/(100);
         _dylanAddress.transfer (dylanTransfer);
         //todo: use owner address from the contract to send the money
-        payable(ownerAddress).transfer();
+        payable(ownerAddress).transfer(address(this).balance);
     }
 
     function presalePurchasedCount(address addr) external view returns (uint) {
