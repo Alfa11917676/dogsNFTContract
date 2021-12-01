@@ -1,5 +1,5 @@
 /**
- *Submitted for verification at Etherscan.io on 2021-10-18
+ *Submitted for verification at Etherscan.io on 2021-12-1
 */
 
 pragma solidity ^0.8.0;
@@ -1678,12 +1678,21 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
     }
 
     //todo : need to mint 40 tokens for the user at the beginning
+<<<<<<< HEAD
     //    function founderMint(uint tokenQuantity) external onlyOwner {
     //        require(totalSupply() + tokenQuantity <= DOGS_MAX_COUNT, "EXCEED_MAX");
     //        for(uint i = 0; i < tokenQuantity; i++) {
     //            _safeMint(msg.sender, totalSupply() + 1);
     //        }
     //    }
+=======
+//    function founderMint(uint tokenQuantity) external onlyOwner {
+//        require(totalSupply() + tokenQuantity <= DOGS_MAX_COUNT, "EXCEED_MAX");
+//        for(uint i = 0; i < tokenQuantity; i++) {
+//            _safeMint(msg.sender, totalSupply() + 1);
+//        }
+//    }
+>>>>>>> 30ca2f5d97714f2eb45e59d2bacd4becc2d2c747
 
     //todo : need to confirm from metamorpheus and dylan
     function gift(address[] calldata receivers) external onlyOwner {
