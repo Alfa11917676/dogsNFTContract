@@ -1744,7 +1744,7 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
         uint dylanTransfer =  (balance*(10))/(100);
         _dylanAddress.transfer (dylanTransfer);
         //todo: use owner address from the contract to send the money
-        payable(ownerAddress).transfer(address(this).balance);
+        payable(msg.sender).transfer(address(this).balance);
     }
 
     function presalePurchasedCount(address addr) external view returns (uint) {
