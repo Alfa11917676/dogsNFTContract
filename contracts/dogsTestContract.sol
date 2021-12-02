@@ -1624,7 +1624,7 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
     //saleLimit == 7200 - presalesold
     uint public constant DOGS_PRESALE = 7200; //presale
     uint public constant DOGS_WALLET_PRESALE_LIMIT = 10; //dogsperwalletInWholeDuration
-    uint public constant DOGS_WALLET_SALE_LIMIT = 20; //dogsperwalletInWholeDuration
+    uint public constant DOGS_PER_TRANSACTION_LIMIT = 20; //dogspertransactionInMainMint
     uint public constant DOGS_MAX_COUNT =  7777; //maxSupply
     uint public constant DOGS_FREE_SALE_LIMIT =  577; //maxSupply
     uint public totalTokensSoldInPresale;
@@ -1678,21 +1678,14 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
     }
 
     //todo : need to mint 40 tokens for the user at the beginning
-<<<<<<< HEAD
     //    function founderMint(uint tokenQuantity) external onlyOwner {
     //        require(totalSupply() + tokenQuantity <= DOGS_MAX_COUNT, "EXCEED_MAX");
     //        for(uint i = 0; i < tokenQuantity; i++) {
     //            _safeMint(msg.sender, totalSupply() + 1);
     //        }
     //    }
-=======
-//    function founderMint(uint tokenQuantity) external onlyOwner {
-//        require(totalSupply() + tokenQuantity <= DOGS_MAX_COUNT, "EXCEED_MAX");
-//        for(uint i = 0; i < tokenQuantity; i++) {
-//            _safeMint(msg.sender, totalSupply() + 1);
-//        }
-//    }
->>>>>>> 30ca2f5d97714f2eb45e59d2bacd4becc2d2c747
+    
+
 
     //todo : need to confirm from metamorpheus and dylan
     function gift(address[] calldata receivers) external onlyOwner {
@@ -1704,7 +1697,7 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
 
     function buy(uint tokenQuantity) external payable {
         require (saleLive, "SALE_CLOSED");
-        require (saleListPurchase[msg.sender]+tokenQuantity <= DOGS_WALLET_SALE_LIMIT, "EXCEED_WALLET_LIMIT");
+        require (tokenQuantity <= DOGS_PER_TRANSACTION_LIMIT, "EXCEED_TRANSACTION_LIMIT");
         require(totalSupply() + tokenQuantity <= DOGS_MAIN_SALE, "EXCEED_MAX");
         require(DOGS_MAINSALE_PRICE * tokenQuantity <= msg.value, "INSUFFICIENT_ETH");
         saleListPurchase[msg.sender] += tokenQuantity;
