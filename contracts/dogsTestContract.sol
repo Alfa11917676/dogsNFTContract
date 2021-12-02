@@ -1681,7 +1681,7 @@ contract TESTDOGS is ERC721Enumerable, Ownable {
     function buy(uint tokenQuantity) external payable {
         require (saleLive, "SALE_CLOSED");
         require (tokenQuantity <= DOGS_PER_TRANSACTION_LIMIT, "TOKEN REQUEST EXCEED PER TRANSACTION");
-        require (totalSupply() + tokenQuantity <= DOGS_MAIN_SALE, "EXCEED_MAX");
+        require (totalSupply() + tokenQuantity <= (DOGS_MAX_COUNT - DOGS_FREE_SALE_LIMIT), "EXCEED_MAX");
         require (DOGS_MAINSALE_PRICE * tokenQuantity <= msg.value, "INSUFFICIENT_ETH");
         saleListPurchase[msg.sender] += tokenQuantity;
         for (uint i = 0; i < tokenQuantity; i++) {
